@@ -9,12 +9,13 @@ Imports System.Collections.Generic
 Imports System.Drawing
 Imports System.Linq
 Imports System.Math
+Imports System.Runtime.CompilerServices
 Imports System.Windows.Forms
 
 'This module contains this program's core procedures.
 Public Module CoreModule
    'The constants used by this program.
-   Private Const TO_RADIANS As Double = 180 / PI   'This value is used to convert degrees to radians.
+   Private Const DEGREES_PER_RADIAN As Double = 180 / PI   'Defines the number of degrees per radian.
 
    'This structure defines a polygon's drawing properties.
    Public Structure FigureDrawingPropertiesStr
@@ -41,7 +42,7 @@ Public Module CoreModule
    } 'Contains the canvas on which the polygons are drawn.
 
    'The variables used by this module.
-   public FigureDrawingProperties() As FigureDrawingPropertiesStr = Enumerable.Repeat(New FigureDrawingPropertiesStr With {.Angle = 0, .DrawRadii = False}, 10).ToArray()   'Contains the polygons' drawing properties.
+   Public FigureDrawingProperties() As FigureDrawingPropertiesStr = Enumerable.Repeat(New FigureDrawingPropertiesStr With {.Angle = 0, .DrawRadii = False}, 10).ToArray()   'Contains the polygons' drawing properties.
    Private FigureSet As New List(Of FigureStr) From {
    New FigureStr With {.Center = New Point(110, 110), .EdgeColor = Color.Green, .LineWidth = 2, .Radii = GenerateRadii(SeedRadii:={100}, Repeat:=360)},
    New FigureStr With {.Center = New Point(320, 110), .EdgeColor = Color.Green, .LineWidth = 2, .Radii = GenerateRadii(SeedRadii:={100}, Repeat:=8)},
@@ -93,14 +94,14 @@ Public Module CoreModule
 
       With Figure
          For Radius As Integer = .Radii.GetLowerBound(0) To .Radii.GetUpperBound(0)
-            RadiusTipX = CInt((Cos(FigureDrawingProperties.Angle / TO_RADIANS) * .Radii(Radius)) + .Center.X)
-            RadiusTipY = CInt((Sin(FigureDrawingProperties.Angle / TO_RADIANS) * .Radii(Radius)) + .Center.Y)
+            RadiusTipX = CInt((Cos(FigureDrawingProperties.Angle.ToRadians()) * .Radii(Radius)) + .Center.X)
+            RadiusTipY = CInt((Sin(FigureDrawingProperties.Angle.ToRadians()) * .Radii(Radius)) + .Center.Y)
             If Radius = .Radii.Count - 1 Then
-               NextRadiusTipX = CInt((Cos((FigureDrawingProperties.Angle + Increment) / TO_RADIANS) * .Radii(0)) + .Center.X)
-               NextRadiusTipY = CInt((Sin((FigureDrawingProperties.Angle + Increment) / TO_RADIANS) * .Radii(0)) + .Center.Y)
+               NextRadiusTipX = CInt((Cos((FigureDrawingProperties.Angle + Increment).ToRadians()) * .Radii(0)) + .Center.X)
+               NextRadiusTipY = CInt((Sin((FigureDrawingProperties.Angle + Increment).ToRadians()) * .Radii(0)) + .Center.Y)
             Else
-               NextRadiusTipX = CInt((Cos((FigureDrawingProperties.Angle + Increment) / TO_RADIANS) * .Radii(Radius + 1)) + .Center.X)
-               NextRadiusTipY = CInt((Sin((FigureDrawingProperties.Angle + Increment) / TO_RADIANS) * .Radii(Radius + 1)) + .Center.Y)
+               NextRadiusTipX = CInt((Cos((FigureDrawingProperties.Angle + Increment).ToRadians()) * .Radii(Radius + 1)) + .Center.X)
+               NextRadiusTipY = CInt((Sin((FigureDrawingProperties.Angle + Increment).ToRadians()) * .Radii(Radius + 1)) + .Center.Y)
             End If
 
             If FigureDrawingProperties.DrawRadii Then CanvasGraphics.DrawLine(Pens.White, .Center.X, .Center.Y, NextRadiusTipX, NextRadiusTipY)
@@ -129,5 +130,11 @@ Public Module CoreModule
       Next Repetition
 
       Return Radii.ToArray()
+   End Function
+
+   'This procedure converts the specified value measured in degrees to radians.
+   <Extension>
+   Private Function ToRadians(Degrees As Double) As Double
+      Return Degrees / DEGREES_PER_RADIAN
    End Function
 End Module
