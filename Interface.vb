@@ -12,34 +12,63 @@ Imports System.Windows.Forms
 Public Class InterfaceWindow
    'This procedure initializes this window.
    Public Sub New()
-      InitializeComponent()
+      Try
+         InitializeComponent()
 
-      My.Computer.FileSystem.CurrentDirectory = My.Application.Info.DirectoryPath
+         My.Computer.FileSystem.CurrentDirectory = My.Application.Info.DirectoryPath
 
-      With My.Application.Info
-         Me.Text = $"{ .Title} v{ .Version} - by: { .CompanyName}"
-      End With
+         Me.Text = My.Application.Info.Title
 
-      With My.Computer.Screen.WorkingArea
-         Me.Size = New Size(CInt(.Width / 1.1), CInt(.Height / 1.1))
-      End With
+         With My.Computer.Screen.WorkingArea
+            Me.Size = New Size(CInt(.Width / 1.1), CInt(.Height / 1.1))
+         End With
 
-      Me.Controls.Add(Canvas)
+         Me.Controls.Add(Canvas)
+      Catch ExceptionO As Exception
+         DisplayError(ExceptionO)
+      End Try
    End Sub
+
+   'This procedure toggles the animator on/off.
+   Private Sub AnimateFiguresMenu_Click(sender As Object, e As EventArgs) Handles AnimateFiguresMenu.Click
+      Try
+         Animator.Enabled = Not Animator.Enabled
+      Catch ExceptionO As Exception
+         DisplayError(ExceptionO)
+      End Try
+   End Sub
+
+   'This procedure gives the toggles drawing radii on/off.
+   Private Sub DrawRadiiMenu_Click(sender As Object, e As EventArgs) Handles DrawRadiiMenu.Click
+      Try
+         For FigureDrawingProperty As Integer = FigureDrawingProperties.GetLowerBound(0) To FigureDrawingProperties.GetUpperBound(0)
+            With FigureDrawingProperties(FigureDrawingProperty)
+               .DrawRadii = Not .DrawRadii
+            End With
+         Next FigureDrawingProperty
+
+         Canvas.Invalidate()
+      Catch ExceptionO As Exception
+         DisplayError(ExceptionO)
+      End Try
+   End Sub
+
+   'This procedure displays information about this program.
+   Private Sub InformationMainMenu_Click(sender As Object, e As EventArgs) Handles InformationMainMenu.Click
+      Try
+         MessageBox.Show(My.Application.Info.Description, ProgramInformation(), MessageBoxButtons.OK, MessageBoxIcon.Information)
+      Catch ExceptionO As Exception
+         DisplayError(ExceptionO)
+      End Try
+   End Sub
+
 
    'This procedure closes this program when this window is closed.
    Private Sub InterfaceWindow_FormClosed(sender As Object, e As EventArgs) Handles Me.FormClosed
-      Application.Exit()
-   End Sub
-
-   'This procedure handles the user's key strokes.3
-   Private Sub InterfaceWindow_KeyPress(sender As Object, e As KeyPressEventArgs) Handles Me.KeyPress
-      For FigureDrawingProperty As Integer = FigureDrawingProperties.GetLowerBound(0) To FigureDrawingProperties.GetUpperBound(0)
-         With FigureDrawingProperties(FigureDrawingProperty)
-            .DrawRadii = Not .DrawRadii
-         End With
-      Next FigureDrawingProperty
-
-      Canvas.Invalidate()
+      Try
+         Application.Exit()
+      Catch ExceptionO As Exception
+         DisplayError(ExceptionO)
+      End Try
    End Sub
 End Class
